@@ -211,7 +211,11 @@ const chapters = [
   },
 ];
 
-const counts = [10, 20, 30, 50, 100];
+function clampQuestionCount(value) {
+  const number = Number.parseInt(value, 10);
+  if (Number.isNaN(number)) return '';
+  return String(Math.min(100, Math.max(1, number)));
+}
 
 function shuffle(items) {
   const result = [...items];
@@ -352,7 +356,7 @@ function isCorrect(question, value) {
 function App() {
   const [screen, setScreen] = useState('setup');
   const [selectedChapterIds, setSelectedChapterIds] = useState([chapters[0].id]);
-  const [questionCount, setQuestionCount] = useState(20);
+  const [questionCount, setQuestionCount] = useState('20');
   const [quiz, setQuiz] = useState([]);
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState('');
@@ -361,6 +365,7 @@ function App() {
   const [results, setResults] = useState([]);
 
   const selectedChapters = chapters.filter((item) => selectedChapterIds.includes(item.id));
+  const resolvedQuestionCount = Number.parseInt(questionCount, 10) || 0;
   const current = quiz[index];
   const progress = quiz.length ? ((index + 1) / quiz.length) * 100 : 0;
   const currentValue = current?.type === 'short' ? typed : selected;
@@ -383,13 +388,19 @@ function App() {
   }
 
   function startQuiz() {
-    setQuiz(buildQuiz(selectedChapters, questionCount));
+    if (resolvedQuestionCount < 1) return;
+    setQuiz(buildQuiz(selectedChapters, resolvedQuestionCount));
     setIndex(0);
     setSelected('');
     setTyped('');
     setChecked(false);
     setResults([]);
     setScreen('quiz');
+  }
+
+  function updateQuestionCount(value) {
+    const digits = value.replace(/\D/g, '');
+    setQuestionCount(digits === '' ? '' : clampQuestionCount(digits));
   }
 
   function checkAnswer() {
@@ -451,18 +462,24 @@ function App() {
               <p>이번에 풀 문항 수를 고르세요.</p>
             </div>
           </div>
-          <div className="countGrid" role="radiogroup" aria-label="문제 개수">
-            {counts.map((count) => (
-              <button
-                key={count}
-                className={`selectBox ${questionCount === count ? 'active' : ''}`}
-                onClick={() => setQuestionCount(count)}
-              >
-                <strong>{count}</strong>
-                <span>문제</span>
-              </button>
-            ))}
-          </div>
+          <label className="countInputCard">
+            <span>문항 수</span>
+            <div className="countInputRow">
+              <input
+                aria-label="문제 개수"
+                inputMode="numeric"
+                max="100"
+                min="1"
+                pattern="[0-9]*"
+                type="number"
+                value={questionCount}
+                onBlur={() => setQuestionCount((value) => clampQuestionCount(value) || '1')}
+                onChange={(event) => updateQuestionCount(event.target.value)}
+              />
+              <strong>문제</strong>
+            </div>
+            <small>1부터 100까지 입력 가능</small>
+          </label>
 
           <div className="sectionTitle">
             <span>2</span>
@@ -510,7 +527,7 @@ function App() {
             ))}
           </div>
 
-          <button className="primaryAction" onClick={startQuiz}>
+          <button className="primaryAction" onClick={startQuiz} disabled={resolvedQuestionCount < 1}>
             시작하기
             <ChevronRight size={20} />
           </button>
@@ -604,7 +621,7 @@ function App() {
             <span>/{results.length}</span>
           </div>
           <h2>풀이 완료</h2>
-          <p>{selectedChapters.map((chapter) => chapter.title).join(', ')}에서 {questionCount}문제를 풀었습니다.</p>
+          <p>{selectedChapters.map((chapter) => chapter.title).join(', ')}에서 {results.length}문제를 풀었습니다.</p>
           <div className="resultRows">
             {['ox', 'choice', 'short'].map((type) => {
               const label = type === 'ox' ? 'OX' : type === 'choice' ? '객관식' : '단답형';

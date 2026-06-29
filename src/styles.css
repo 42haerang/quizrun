@@ -113,13 +113,7 @@ h2 {
   font-size: 13px;
 }
 
-.countGrid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.selectBox,
+.countInputCard,
 .chapter,
 .answer {
   border: 1px solid #dde4ea;
@@ -129,27 +123,58 @@ h2 {
   box-shadow: 0 10px 24px rgba(31, 42, 55, 0.06);
 }
 
-.selectBox {
-  min-height: 76px;
+.countInputCard {
+  min-height: 110px;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 8px;
+  padding: 15px;
 }
 
-.selectBox strong {
-  font-size: 24px;
-  line-height: 1;
-}
-
-.selectBox span {
-  font-size: 13px;
+.countInputCard > span,
+.countInputCard small {
   color: #717982;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.countInputCard small {
   font-weight: 700;
 }
 
-.selectBox.active,
+.countInputRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.countInputRow input {
+  width: 100%;
+  min-width: 0;
+  height: 54px;
+  border: 1px solid #cfd8df;
+  border-radius: 8px;
+  background: #f8fafb;
+  color: #20242a;
+  font-size: 28px;
+  font-weight: 900;
+  outline: none;
+  padding: 0 14px;
+}
+
+.countInputRow input:focus {
+  border-color: #2dbf8f;
+  box-shadow: 0 0 0 4px rgba(45, 191, 143, 0.14);
+}
+
+.countInputRow strong {
+  color: #20242a;
+  font-size: 17px;
+  font-weight: 900;
+}
+
 .chapter.active,
 .answer.selected {
   border-color: #2dbf8f;
@@ -479,7 +504,7 @@ h2 {
     grid-column: 2;
   }
 
-  .countGrid,
+  .countInputCard,
   .primaryAction {
     grid-column: 1;
   }
